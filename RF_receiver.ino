@@ -1,3 +1,15 @@
+//  ARDUINO |MODULO  | nrF
+//  D9      |CE      | CE  (3)
+//  D10     |CSN     | CSN (4)
+//  D11     |MO      | MO  (6)
+//  D12     |MI      | MI  (7)
+//  D13     |SCK     | SCK (5)
+//  5 ou 3.3|VCC     | VCC (2)
+//  GND     |GND     | GND (1)
+
+// SE ESTIVER LIGADO O MODULO, O MODULO LIGA NO 5V
+// DO CONTRARIO, SE FOR O NRF, LIGA NO 3.3V
+
 #include <Servo.h>
 #include <SPI.h>
 #include "nRF24L01.h"
