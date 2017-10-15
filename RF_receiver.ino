@@ -1,3 +1,4 @@
+#include <flyaway_protocol.h>
 #include <Servo.h>
 #include <SPI.h>
 #include "nRF24L01.h"
@@ -15,7 +16,20 @@ const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 char receivedControls[6] = "aaaa;";
 int j1x,j1y,j2x,j2y;
 
-Servo myservo;
+//Servo myservo;
+Servo servo1;
+Servo servo2;
+Servo servo3;
+Servo servo4;
+
+void z_axis_handle(int16_t z){
+  z=map(z, 0, 15, 0, 180);
+  z=180-z;
+  servo1.write(z);
+  servo2.write(z);
+  servo3.write(z);
+  servo4.write(z);
+}
 
 void setup(void)
 {
@@ -37,7 +51,8 @@ void setup(void)
   //Listen to Radio and print details about it.
   radio.startListening();
   radio.printDetails();
-  myservo.attach(3);
+  //myservo.attach(3);
+  servo1.attach(3);
   pinMode(4,OUTPUT);
   digitalWrite(4,HIGH);
 }
@@ -67,15 +82,16 @@ int hextodecimal(char c){
 
 void loop(void)
 {
+    char buff[128];
     //check if there is data available
     if ( radio.available() )
     {
       // Dump the payloads until we've gotten everything
       
-      bool done = false;
+      /*bool done = false;
             
-      while(!done)
-        done=radio.read( &receivedControls, sizeof(receivedControls));
+      //while(!done)
+        radio.read( &receivedControls, sizeof(receivedControls));
       
       Serial.print("Posicoes: ");
       Serial.print(receivedControls);
@@ -93,7 +109,16 @@ void loop(void)
       
       // Send the final one back.
       Serial.println(" ... Enviando resposta.");
-      radio.write( &receivedControls, sizeof(receivedControls) );
+      radio.write( &receivedControls, sizeof(receivedControls) );*/
+      fad_manual_control manual_control;
+      radio.read(&buff, sizeof(buff));
+      decode_manual_control_frame(buff, &manual_control);
+
+      Serial.println(manual_control.x);
+      Serial.println(manual_control.y);
+      Serial.println(manual_control.z);
+
+      z_axis_handle(manual_control.z);
       
       // Now, resume listening so we catch the next packets.
       radio.startListening();
